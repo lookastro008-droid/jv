@@ -1,0 +1,42 @@
+name: Build APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git zip unzip openjdk-11-jdk \
+          python3-pip autoconf libtool \
+          pkg-config zlib1g-dev libncurses5-dev \
+          cmake libffi-dev libssl-dev wget \
+          libxml2-dev libxslt-dev python3-setuptools
+          
+    - name: Install Buildozer
+      run: |
+        pip3 install --upgrade pip
+        pip3 install buildozer cython==0.29.19
+        
+    - name: Build APK
+      run: |
+        buildozer init
+        buildozer -v android debug
+        
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: jyotish-app-apk
+        path: bin/*.apk
+        
+    - name: Display build info
+      run: |
+        echo "✅ APK build completed!"
+        echo "📱 App will be installed as: ജ്യോതിഷമഞ്ജരി"
+        echo "📦 Package name: org.jyotish.jyotishamanjari"
